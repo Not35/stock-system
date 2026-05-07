@@ -3,503 +3,677 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ระบบจัดการราคาสินค้า Pro</title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
-    
+    <title>Modern OpenChat Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
-        :root {
-            --primary: #4F46E5;       
-            --primary-hover: #4338CA;
-            --success: #10B981;       
-            --success-hover: #059669;
-            --danger: #EF4444;        
-            --danger-hover: #DC2626;
-            --warning: #F59E0B;       
-            --warning-hover: #D97706;
-            --bg-color: #F3F4F6;      
-            --card-bg: #FFFFFF;       
-            --text-main: #1F2937;     
-            --text-muted: #6B7280;    
-            --border-color: #E5E7EB;  
-        }
-
-        body { 
-            font-family: 'Prompt', sans-serif; 
-            background-color: var(--bg-color); 
-            color: var(--text-main);
-            margin: 0; 
-            padding: 20px; 
-            display: flex;
-            justify-content: center;
-        }
-
-        .container { width: 100%; max-width: 900px; }
-
-        .card {
-            background: var(--card-bg); 
-            padding: 30px; 
-            border-radius: 16px; 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05); 
-            margin-bottom: 20px;
-            animation: fadeIn 0.4s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        h2, h3 { color: var(--text-main); margin-top: 0; font-weight: 600; }
-        h2 { font-size: 24px; margin-bottom: 25px; text-align: center; }
-        h3 { font-size: 18px; border-bottom: 2px solid var(--bg-color); padding-bottom: 10px; margin-bottom: 20px; }
-
-        .hidden { display: none !important; }
-
-        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        body { font-family: 'Prompt', sans-serif; background-color: #e2e8f0; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .chat-bg { background-color: #8baab5; } 
+        .switch-mode { color: #64748b; font-size: 13px; margin-top: 25px; cursor: pointer; text-align: center; transition: 0.3s; padding: 10px; border-radius: 8px; }
+        .switch-mode:hover { color: #3b82f6; background-color: #eff6ff; }
         
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 6px; font-size: 14px; font-weight: 500; color: var(--text-muted); }
-        .form-group input { 
-            width: 100%; padding: 12px 15px; border: 1px solid var(--border-color); 
-            border-radius: 8px; box-sizing: border-box; font-family: 'Prompt', sans-serif;
-            font-size: 15px; transition: all 0.3s; background-color: #F9FAFB;
-        }
-        .form-group input:focus { 
-            outline: none; border-color: var(--primary); background-color: #FFF;
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2); 
-        }
-
-        button { 
-            font-family: 'Prompt', sans-serif; padding: 12px 20px; border: none; 
-            border-radius: 8px; cursor: pointer; font-size: 15px; font-weight: 500;
-            transition: all 0.2s ease; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-        }
-        button:active { transform: scale(0.97); }
+        .admin-tab { cursor: pointer; padding: 12px; border-bottom: 3px solid transparent; color: #94a3b8; font-weight: 500; transition: 0.3s; text-align: center; }
+        .admin-tab.active { border-bottom: 3px solid #3b82f6; color: #1e293b; font-weight: 700; background-color: #f8fafc; }
+        .swal2-popup { border-radius: 24px !important; padding: 2em !important; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1) !important; }
         
-        .btn-primary { background-color: var(--primary); color: white; width: 100%; }
-        .btn-primary:hover { background-color: var(--primary-hover); }
-        .btn-success { background-color: var(--success); color: white; }
-        .btn-success:hover { background-color: var(--success-hover); }
-        .btn-danger { background-color: var(--danger); color: white; }
-        .btn-danger:hover { background-color: var(--danger-hover); }
-        .btn-warning { background-color: var(--warning); color: white; }
-        .btn-warning:hover { background-color: var(--warning-hover); }
-        .btn-secondary { background-color: #E5E7EB; color: var(--text-main); }
-        .btn-secondary:hover { background-color: #D1D5DB; }
-
-        .nav-buttons { display: flex; gap: 10px; margin-bottom: 25px; background: #F9FAFB; padding: 10px; border-radius: 12px; flex-wrap: wrap; }
-        .nav-buttons button { flex: 1; min-width: calc(50% - 10px); background: transparent; color: var(--text-muted); border-radius: 8px; padding: 10px; font-size: 14px;}
-        .nav-buttons button.active { background-color: var(--primary); color: white; box-shadow: 0 4px 6px rgba(79, 70, 229, 0.2); }
-        .nav-buttons button.logout-btn { background-color: transparent; color: var(--danger); }
-        .nav-buttons button.logout-btn:hover { background-color: #FEE2E2; }
-
-        .search-box { position: relative; margin-bottom: 20px; }
-        .search-box input { padding-left: 40px; font-size: 16px; }
-        .search-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); font-size: 18px; color: var(--text-muted); }
-
-        .product-item, .employee-item { 
-            padding: 16px 20px; background: #F9FAFB; border: 1px solid var(--border-color);
-            border-radius: 12px; margin-bottom: 10px; cursor: pointer; display: flex; 
-            justify-content: space-between; align-items: center; transition: all 0.2s;
-        }
-        .product-item:hover, .employee-item:hover { 
-            background-color: #FFF; border-color: var(--primary);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05); transform: translateX(4px);
-        }
-        .product-name { font-weight: 500; font-size: 16px; line-height: 1.4; }
-        .product-price-badge { background: #EEF2FF; color: var(--primary); padding: 6px 12px; border-radius: 20px; font-weight: 600; font-size: 14px; white-space: nowrap; margin-left: 10px;}
-
-        .product-details { background: #F8FAFC; border: 1px solid #E2E8F0; padding: 25px; border-radius: 12px; margin-top: 15px; }
-        .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
-        .detail-box { background: white; padding: 15px; border-radius: 8px; border: 1px solid var(--border-color); }
-        .detail-label { font-size: 12px; color: var(--text-muted); margin-bottom: 4px; }
-        .detail-value { font-size: 18px; font-weight: 600; color: var(--text-main); }
-        .customer-list { margin: 0; padding-left: 20px; color: var(--text-main); line-height: 1.8; }
-        
-        .action-buttons { display: flex; gap: 10px; margin-top: 20px; }
-        .action-buttons button { flex: 1; }
-
-        .header-title-row { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 20px; gap: 10px;}
-        .header-title-row h2 { margin: 0; text-align: left; }
-
-        .cust-row-wrapper { display: flex; gap: 10px; align-items: flex-end; margin-bottom: 10px; background: #F9FAFB; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color);}
-        .cust-row-wrapper .form-group { margin-bottom: 0; flex: 1; }
-        .cust-row-wrapper .delete-btn-box { flex: 0 0 auto; }
-
-        /* ปรับแต่งฟอนต์ของ SweetAlert2 ให้ตรงกับเว็บ */
-        div:where(.swal2-container) { font-family: 'Prompt', sans-serif; }
-
-        @media (max-width: 600px) {
-            body { padding: 10px; }
-            .card { padding: 15px; border-radius: 12px; }
-            .form-row { grid-template-columns: 1fr; gap: 0; }
-            .form-group { margin-bottom: 12px; }
-            .form-row .form-group[style*="grid-column"] { grid-column: auto !important; }
-            .nav-buttons { gap: 5px; padding: 8px; }
-            .nav-buttons button { min-width: 100%; font-size: 15px; padding: 12px; }
-            .detail-grid { grid-template-columns: 1fr; gap: 10px; }
-            .action-buttons { flex-direction: column; }
-            .action-buttons button { width: 100%; }
-            .header-title-row h2 { font-size: 20px; }
-            .header-title-row span { display: block; width: 100%; font-size: 13px; margin-top: 5px;}
-            .cust-row-wrapper { flex-direction: column; align-items: stretch; padding: 15px; }
-            .cust-row-wrapper .delete-btn-box { text-align: right; margin-top: 5px; }
-            .cust-row-wrapper .delete-btn-box button { width: 100%; }
-        }
+        @keyframes ring { 0% { transform: rotate(0); } 15% { transform: rotate(15deg); } 30% { transform: rotate(-15deg); } 45% { transform: rotate(10deg); } 60% { transform: rotate(-10deg); } 75% { transform: rotate(5deg); } 100% { transform: rotate(0); } }
+        .bell-ring { animation: ring 0.5s ease-in-out; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        .msg-card { animation: slideIn 0.3s ease-out forwards; }
     </style>
 </head>
-<body>
+<body class="min-h-screen flex items-center justify-center sm:p-4 md:p-8 bg-slate-200">
 
-<div class="container">
-    <div id="loginSection" class="card" style="max-width: 400px; margin: 50px auto;">
-        <h2 style="text-align: center;">👋 เข้าสู่ระบบ</h2>
-        <div class="form-group"><label>Username</label><input type="text" id="username" placeholder="ลองใช้ admin"></div>
-        <div class="form-group"><label>Password</label><input type="password" id="password" placeholder="ลองใช้ 1234"></div>
-        <button class="btn-primary" onclick="login()" style="margin-top: 10px;">เข้าสู่ระบบ</button>
+    <div id="loadingOverlay" class="fixed inset-0 bg-white/80 z-[100] flex items-center justify-center hidden backdrop-blur-sm">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-4 border-blue-600 shadow-lg"></div>
     </div>
 
-    <div id="mainSection" class="hidden">
-        <div class="card" style="padding-bottom: 15px; margin-bottom: 15px;">
-            <div class="header-title-row">
-                <h2 id="welcomeMsg">📦 จัดการสินค้า</h2>
+    <div id="loginScreen" class="bg-white w-full max-w-md h-screen sm:h-auto sm:min-h-[550px] sm:rounded-3xl sm:shadow-2xl flex flex-col justify-center items-center p-8 relative overflow-hidden transition-all duration-300">
+        <div class="absolute top-0 left-0 w-full h-40 bg-gradient-to-b from-blue-100 to-transparent"></div>
+        <div class="z-10 text-center w-full mt-4">
+            <div class="w-24 h-24 bg-gradient-to-tr from-blue-600 to-indigo-500 rounded-2xl rotate-3 flex items-center justify-center mx-auto mb-8 shadow-xl">
+                <i class="fas fa-comments text-4xl text-white -rotate-3"></i>
             </div>
-            <div class="nav-buttons">
-                <button id="btnSearchTab" class="active" onclick="showTab('searchTab', this)">🔍 ค้นหาสินค้า</button>
-                <button id="btnAddTab" onclick="showTab('addTab', this)">➕ เพิ่มสินค้า</button>
-                <button id="btnEmpTab" onclick="showTab('employeeTab', this)">👥 พนักงาน</button>
-                <button class="logout-btn" onclick="confirmLogout()">🚪 ออกจากระบบ</button>
-            </div>
-        </div>
+            <h1 class="text-3xl font-bold text-gray-800 mb-2 tracking-tight">OpenChat</h1>
+            <p class="text-gray-500 text-sm mb-10">สังคมแห่งการแบ่งปัน (ไม่ระบุตัวตน)</p>
 
-        <div id="searchTab">
-            <div class="card">
-                <div class="search-box">
-                    <span class="search-icon">🔍</span>
-                    <input type="text" id="searchInput" placeholder="พิมพ์ชื่อสินค้าเพื่อค้นหา..." onkeyup="searchProduct()">
+            <div class="space-y-5">
+                <div class="relative group">
+                    <i class="fas fa-user absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition"></i>
+                    <input type="text" id="displayName" class="w-full bg-gray-50/50 border-2 border-gray-100 text-gray-800 rounded-2xl px-12 py-4 focus:outline-none focus:border-blue-500 focus:bg-white transition-all shadow-inner" placeholder="ตั้งชื่อเล่นของคุณ..." onkeyup="if(event.key === 'Enter') enterChat();">
                 </div>
-                <div id="productList"></div>
+                <button onclick="enterChat()" class="w-full bg-blue-600 text-white font-bold text-lg py-4 rounded-2xl hover:bg-blue-700 shadow-lg shadow-blue-500/30 transition transform hover:-translate-y-1 active:scale-95">
+                    เข้าร่วมแชท
+                </button>
             </div>
-            <div id="productDetail" class="card product-details hidden"></div>
-        </div>
-
-        <div id="addTab" class="card hidden">
-            <h3>✨ เพิ่มสินค้าใหม่</h3>
-            <div class="form-group"><label>ชื่อสินค้า</label><input type="text" id="addName" placeholder="เช่น รองเท้าผ้าใบ"></div>
-            <div class="form-row">
-                <div class="form-group"><label>ต้นทุน (บาท)</label><input type="number" id="addCost"></div>
-                <div class="form-group"><label>ราคาขายทั่วไป (บาท)</label><input type="number" id="addPrice"></div>
-                <div class="form-group" style="grid-column: span 2;"><label>ราคาขายส่ง (บาท)</label><input type="number" id="addWholesale"></div>
+            <div class="switch-mode mt-8" onclick="toggleLoginMode('admin')">
+                <i class="fas fa-fingerprint mr-1"></i> เข้าสู่ระบบจัดการ (Admin Panel)
             </div>
-            
-            <h3 style="margin-top: 20px;">🎯 ราคาเฉพาะลูกค้า</h3>
-            <div id="addCustomerContainer"></div>
-            <button class="btn-secondary" style="font-size: 14px; width: auto;" onclick="addCustomerRow('addCustomerContainer')">➕ เพิ่มชื่อลูกค้า</button>
-            <button class="btn-success" style="width: 100%; margin-top: 20px;" onclick="saveNewProduct()">💾 บันทึกสินค้าใหม่</button>
-        </div>
-
-        <div id="editTab" class="card hidden">
-            <h3 style="color: var(--warning);">✏️ หน้าแก้ไขข้อมูลสินค้า</h3>
-            <input type="hidden" id="editIndex">
-            
-            <div class="form-group"><label>ชื่อสินค้า</label><input type="text" id="editName"></div>
-            <div class="form-row">
-                <div class="form-group"><label>ต้นทุน (บาท)</label><input type="number" id="editCost"></div>
-                <div class="form-group"><label>ราคาขายทั่วไป (บาท)</label><input type="number" id="editPrice"></div>
-                <div class="form-group" style="grid-column: span 2;"><label>ราคาขายส่ง (บาท)</label><input type="number" id="editWholesale"></div>
-            </div>
-            
-            <h3 style="margin-top: 20px; color: var(--primary);">🎯 จัดการราคาเฉพาะลูกค้า</h3>
-            <div id="editCustomerContainer"></div>
-            <button class="btn-secondary" style="font-size: 14px; width: auto;" onclick="addCustomerRow('editCustomerContainer')">➕ เพิ่มลูกค้าในหน้านี้</button>
-            
-            <div class="action-buttons">
-                <button class="btn-warning" onclick="saveEditedProduct()">💾 บันทึกการแก้ไข</button>
-                <button class="btn-secondary" onclick="showTab('searchTab', document.getElementById('btnSearchTab'))">❌ ยกเลิก</button>
-            </div>
-        </div>
-
-        <div id="employeeTab" class="card hidden">
-            <h3>👤 เพิ่มพนักงานใหม่</h3>
-            <div class="form-row">
-                <div class="form-group" style="grid-column: span 2;"><label>ชื่อ-นามสกุล</label><input type="text" id="empName"></div>
-                <div class="form-group"><label>Username</label><input type="text" id="empUser"></div>
-                <div class="form-group"><label>Password</label><input type="text" id="empPass"></div>
-            </div>
-            <button class="btn-primary" onclick="addEmployee()">➕ สร้างบัญชีพนักงาน</button>
-            <h3 style="margin-top: 30px;">📋 รายชื่อพนักงานในระบบ</h3>
-            <div id="employeeList"></div>
         </div>
     </div>
-</div>
 
-<script>
-    let mockEmployees = [{ name: "ผู้ดูแลระบบ", username: "admin", password: "1234" }];
-    let mockProducts = [
-        { name: "สว่านไร้สาย 20V", cost: 1200, price: 1890, wholesale: 1500, customerPrices: { "บจก. ก่อสร้างไทย": 1450, "ช่างดำ": 1400 } },
-        { name: "ชุดไขควงอเนกประสงค์", cost: 250, price: 450, wholesale: 380, customerPrices: {} }
-    ];
-    let currentUser = null;
-
-    function login() {
-        const user = document.getElementById('username').value;
-        const pass = document.getElementById('password').value;
-        if (user === "admin" && pass === "1234") {
-            currentUser = { name: "แอดมิน" };
-            document.getElementById('loginSection').classList.add('hidden');
-            document.getElementById('mainSection').classList.remove('hidden');
-            document.getElementById('welcomeMsg').innerHTML = `📦 จัดการสินค้า <br><span style="font-size:14px; color:var(--text-muted); font-weight:normal;">ผู้ใช้งาน: ${currentUser.name}</span>`;
-            renderProducts(mockProducts);
-            renderEmployees();
-            
-            // เด้งกลางจอ
-            Swal.fire({
-                icon: 'success', 
-                title: 'เข้าสู่ระบบสำเร็จ',
-                showConfirmButton: false, 
-                timer: 1500
-            });
-        } else { 
-            // เด้งกลางจอ
-            Swal.fire({ 
-                icon: 'error', 
-                title: 'เข้าสู่ระบบล้มเหลว', 
-                text: 'Username หรือ Password ไม่ถูกต้อง!', 
-                confirmButtonColor: '#4F46E5' 
-            });
-        }
-    }
-
-    function confirmLogout() {
-        Swal.fire({
-            title: 'ต้องการออกจากระบบ?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#4F46E5',
-            cancelButtonColor: '#6B7280',
-            confirmButtonText: 'ออกจากระบบ',
-            cancelButtonText: 'ยกเลิก'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                location.reload();
-            }
-        });
-    }
-
-    function showTab(tabId, btnElement) {
-        document.getElementById('searchTab').classList.add('hidden');
-        document.getElementById('addTab').classList.add('hidden');
-        document.getElementById('editTab').classList.add('hidden');
-        document.getElementById('employeeTab').classList.add('hidden');
-        document.getElementById('productDetail').classList.add('hidden');
-        
-        document.querySelectorAll('.nav-buttons button:not(.logout-btn)').forEach(btn => btn.classList.remove('active'));
-        if(btnElement) btnElement.classList.add('active');
-
-        if(tabId === 'addTab') {
-            document.querySelectorAll('#addTab input').forEach(inp => inp.value = '');
-            document.getElementById('addCustomerContainer').innerHTML = '';
-        }
-        document.getElementById(tabId).classList.remove('hidden');
-    }
-
-    function searchProduct() {
-        const query = document.getElementById('searchInput').value.toLowerCase();
-        const filtered = mockProducts.filter(p => p.name.toLowerCase().includes(query));
-        renderProducts(filtered);
-    }
-
-    function renderProducts(products) {
-        const list = document.getElementById('productList');
-        list.innerHTML = '';
-        products.forEach((p) => {
-            const index = mockProducts.indexOf(p);
-            const div = document.createElement('div');
-            div.className = 'product-item';
-            div.innerHTML = `<div class="product-name">${p.name}</div><div class="product-price-badge">฿${Number(p.price).toLocaleString()}</div>`;
-            div.onclick = () => showDetails(index);
-            list.appendChild(div);
-        });
-    }
-
-    function showDetails(index) {
-        const p = mockProducts[index];
-        const detailDiv = document.getElementById('productDetail');
-        detailDiv.classList.remove('hidden');
-        
-        let custHTML = '';
-        for (let c in p.customerPrices) { custHTML += `<li>${c}: <b>฿${Number(p.customerPrices[c]).toLocaleString()}</b></li>`; }
-
-        detailDiv.innerHTML = `
-            <h3>${p.name}</h3>
-            <div class="detail-grid">
-                <div class="detail-box"><div class="detail-label">ราคาทุน</div><div class="detail-value">฿${Number(p.cost).toLocaleString()}</div></div>
-                <div class="detail-box" style="border-color:var(--primary);"><div class="detail-label" style="color:var(--primary);">ราคาขายปกติ</div><div class="detail-value" style="color:var(--primary);">฿${Number(p.price).toLocaleString()}</div></div>
-                <div class="detail-box"><div class="detail-label">ราคาส่ง</div><div class="detail-value">฿${Number(p.wholesale).toLocaleString()}</div></div>
+    <div id="adminLoginScreen" class="bg-slate-900 w-full max-w-md h-screen sm:h-auto sm:min-h-[550px] sm:rounded-3xl sm:shadow-2xl flex flex-col justify-center items-center p-8 relative hidden transition-all duration-300">
+        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20"></div>
+        <div class="z-10 text-center w-full">
+            <div class="w-20 h-20 bg-slate-800 border border-slate-700 rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl">
+                <i class="fas fa-user-shield text-3xl text-blue-400"></i>
             </div>
-            <div class="detail-box" style="background:#F9FAFB;">
-                <div class="detail-label">ราคาลูกค้าเจาะจง</div>
-                <ul class="customer-list">${custHTML || '<li style="color:#9CA3AF;">ไม่มีข้อมูล</li>'}</ul>
+            <h1 class="text-2xl font-bold text-white mb-2">ระบบผู้ดูแลระบบ</h1>
+            <p class="text-slate-400 text-sm mb-8">กรุณายืนยันตัวตนเพื่อเข้าถึงสิทธิ์</p>
+            <div class="space-y-4">
+                <div class="relative">
+                    <i class="fas fa-key absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-500"></i>
+                    <input type="password" id="adminPassword" class="w-full bg-slate-800 border border-slate-700 text-white rounded-xl px-12 py-4 focus:outline-none focus:border-blue-500 transition shadow-inner placeholder-slate-500" placeholder="รหัสผ่านผู้ดูแล..." onkeyup="if(event.key === 'Enter') enterAdmin();">
+                </div>
+                <button onclick="enterAdmin()" class="w-full bg-blue-600 text-white font-bold py-4 rounded-xl hover:bg-blue-500 shadow-lg shadow-blue-500/20 transition transform hover:-translate-y-0.5">
+                    เข้าสู่ระบบ
+                </button>
             </div>
-            <div class="action-buttons">
-                <button class="btn-warning" onclick="openEditPage(${index})">✏️ แก้ไข</button>
-                <button class="btn-danger" onclick="deleteProduct(${index})">🗑️ ลบ</button>
+            <div class="mt-8 text-slate-400 text-sm cursor-pointer hover:text-white transition" onclick="toggleLoginMode('user')">
+                <i class="fas fa-arrow-left mr-1"></i> กลับไปหน้าหลัก
             </div>
-        `;
-    }
+        </div>
+    </div>
 
-    function addCustomerRow(containerId, name = '', price = '') {
-        const container = document.getElementById(containerId);
-        const div = document.createElement('div');
-        div.className = 'cust-row-wrapper cust-row';
-        div.innerHTML = `
-            <div class="form-group">
-                <label>ชื่อลูกค้า</label>
-                <input type="text" class="c-name" placeholder="ชื่อลูกค้า" value="${name}">
+    <div id="chatScreen" class="w-full h-screen max-w-full sm:max-w-2xl md:max-w-3xl lg:max-w-4xl sm:h-[90vh] bg-gray-50 sm:shadow-2xl relative flex flex-col hidden overflow-hidden sm:rounded-3xl border border-gray-200">
+        <div class="bg-white px-4 py-3 flex items-center justify-between shadow-sm z-20">
+            <div class="flex items-center gap-3">
+                <button onclick="leaveChat()" class="text-gray-600 hover:bg-gray-100 p-2 rounded-full transition w-10 h-10 flex items-center justify-center">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <div>
+                    <h3 class="font-bold text-gray-800 text-md leading-tight">กลุ่มพูดคุยทั่วไป</h3>
+                    <p class="text-[11px] text-gray-500"><i class="fas fa-users mr-1"></i>OpenChat Area</p>
+                </div>
             </div>
-            <div class="form-group">
-                <label>ราคา</label>
-                <input type="number" class="c-price" placeholder="ราคา" value="${price}">
+            <button onclick="openGameDrawer()" class="relative text-gray-600 hover:bg-gray-100 p-2 rounded-full transition w-10 h-10 flex items-center justify-center">
+                <i class="fas fa-bars text-lg"></i>
+                <span id="mainChatBadge" class="absolute top-1 right-1 bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full hidden shadow-sm border border-white">0</span>
+            </button>
+        </div>
+
+        <div id="chatBox" class="flex-1 chat-bg p-4 sm:p-6 md:p-8 overflow-y-auto no-scrollbar pb-24 sm:pb-28 flex flex-col space-y-4"></div>
+
+        <div class="bg-white px-3 sm:px-6 py-3 border-t flex items-end gap-2 absolute bottom-0 w-full z-20 shadow-[0_-5px_15px_rgba(0,0,0,0.03)]">
+            <input type="file" id="imageInput" accept="image/*" class="hidden" onchange="handleImageSelection(event)">
+            <button onclick="document.getElementById('imageInput').click()" class="text-gray-500 hover:bg-gray-100 p-3 rounded-full transition mb-0.5">
+                <i class="fas fa-image text-xl"></i>
+            </button>
+            <div class="flex-1 bg-gray-100/80 rounded-3xl flex items-center px-4 py-2.5 sm:py-3 border border-transparent focus-within:bg-white focus-within:border-blue-300 focus-within:shadow-sm transition-all">
+                <input type="text" id="chatInput" class="w-full bg-transparent outline-none text-sm sm:text-base" placeholder="พิมพ์ข้อความ..." onkeyup="if(event.key === 'Enter') handleSendText();">
             </div>
-            <div class="delete-btn-box">
-                <button class="btn-danger" onclick="this.parentElement.parentElement.remove()">🗑️ ลบ</button>
-            </div>
-        `;
-        container.appendChild(div);
-    }
+            <button onclick="handleSendText()" class="bg-blue-600 text-white w-11 h-11 sm:w-12 sm:h-12 rounded-full flex items-center justify-center hover:bg-blue-700 shadow-md mb-0.5 flex-shrink-0 transition transform active:scale-90">
+                <i class="fas fa-paper-plane text-sm sm:text-base pl-0.5"></i>
+            </button>
+        </div>
+    </div>
 
-    function saveNewProduct() {
-        const name = document.getElementById('addName').value;
-        const cost = document.getElementById('addCost').value || 0;
-        const price = document.getElementById('addPrice').value;
-        const wholesale = document.getElementById('addWholesale').value || 0;
-        
-        if(!name || !price) {
-            // เด้งกลางจอ
-            return Swal.fire({ icon: 'warning', title: 'ข้อมูลไม่ครบถ้วน', text: 'กรุณากรอกชื่อและราคาขาย', confirmButtonColor: '#4F46E5' });
-        }
 
-        let custObj = {};
-        document.querySelectorAll('#addCustomerContainer .cust-row').forEach(row => {
-            let n = row.querySelector('.c-name').value;
-            let p = row.querySelector('.c-price').value;
-            if(n && p) custObj[n] = p;
-        });
-
-        mockProducts.unshift({ name, cost, price, wholesale, customerPrices: custObj });
-        
-        // เด้งกลางจอ
-        Swal.fire({ 
-            icon: 'success', 
-            title: 'เพิ่มสินค้าสำเร็จ', 
-            showConfirmButton: false, 
-            timer: 1500 
-        });
-        
-        showTab('searchTab', document.getElementById('btnSearchTab'));
-        renderProducts(mockProducts);
-    }
-
-    function openEditPage(index) {
-        const p = mockProducts[index];
-        document.getElementById('editIndex').value = index;
-        document.getElementById('editName').value = p.name;
-        document.getElementById('editCost').value = p.cost;
-        document.getElementById('editPrice').value = p.price;
-        document.getElementById('editWholesale').value = p.wholesale;
-        
-        const custContainer = document.getElementById('editCustomerContainer');
-        custContainer.innerHTML = ''; 
-        for(let customerName in p.customerPrices) {
-            addCustomerRow('editCustomerContainer', customerName, p.customerPrices[customerName]);
-        }
-        showTab('editTab', null);
-    }
-
-    function saveEditedProduct() {
-        const index = document.getElementById('editIndex').value;
-        const name = document.getElementById('editName').value;
-        const cost = document.getElementById('editCost').value || 0;
-        const price = document.getElementById('editPrice').value;
-        const wholesale = document.getElementById('editWholesale').value || 0;
-        
-        if(!name || !price) {
-            // เด้งกลางจอ
-            return Swal.fire({ icon: 'warning', title: 'ข้อมูลไม่ครบถ้วน', text: 'กรุณากรอกชื่อและราคาขาย', confirmButtonColor: '#4F46E5' });
-        }
-
-        let custObj = {};
-        document.querySelectorAll('#editCustomerContainer .cust-row').forEach(row => {
-            let n = row.querySelector('.c-name').value;
-            let p = row.querySelector('.c-price').value;
-            if(n && p) custObj[n] = p;
-        });
-
-        mockProducts[index] = { name, cost, price, wholesale, customerPrices: custObj };
-        
-        // เด้งกลางจอ แจ้งเตือนบันทึกสำเร็จ
-        Swal.fire({ 
-            icon: 'success', 
-            title: 'บันทึกการแก้ไขสำเร็จ', 
-            showConfirmButton: false, 
-            timer: 1500 
-        });
-        
-        showTab('searchTab', document.getElementById('btnSearchTab'));
-        renderProducts(mockProducts);
-        document.getElementById('searchInput').value = '';
-    }
-
-    function deleteProduct(index) {
-        // เด้งกลางจอ ให้ยืนยัน
-        Swal.fire({
-            title: 'ยืนยันการลบ?',
-            text: `คุณต้องการลบ "${mockProducts[index].name}" ใช่หรือไม่?`,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#EF4444',
-            cancelButtonColor: '#6B7280',
-            confirmButtonText: '🗑️ ใช่, ลบเลย',
-            cancelButtonText: 'ยกเลิก'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                mockProducts.splice(index, 1);
-                document.getElementById('productDetail').classList.add('hidden');
-                renderProducts(mockProducts);
-                
-                // เด้งกลางจอ ยืนยันลบสำเร็จ
-                Swal.fire({ icon: 'success', title: 'ลบข้อมูลสำเร็จ', showConfirmButton: false, timer: 1500 });
-            }
-        });
-    }
-
-    function addEmployee() {
-        const name = document.getElementById('empName').value;
-        const user = document.getElementById('empUser').value;
-        const pass = document.getElementById('empPass').value;
-        
-        if(!name || !user || !pass) {
-            // เด้งกลางจอ
-            return Swal.fire({ icon: 'warning', title: 'ข้อมูลไม่ครบ', text: 'กรุณากรอกข้อมูลพนักงานให้ครบถ้วน', confirmButtonColor: '#4F46E5' });
-        }
-        
-        mockEmployees.push({ name, username: user, password: pass });
-        
-        // เด้งกลางจอ
-        Swal.fire({ icon: 'success', title: 'สร้างบัญชีพนักงานสำเร็จ', showConfirmButton: false, timer: 1500 });
-        
-        document.querySelectorAll('#employeeTab input').forEach(i => i.value='');
-        renderEmployees();
-    }
+    <div id="gameDrawerOverlay" class="fixed inset-0 bg-black/40 z-[40] hidden backdrop-blur-sm transition-opacity duration-300" onclick="closeGameDrawer()"></div>
     
-    function renderEmployees() {
-        document.getElementById('employeeList').innerHTML = '';
-        mockEmployees.forEach(e => {
-            document.getElementById('employeeList').innerHTML += `<div class="employee-item" style="display:block;"><strong>${e.name}</strong> <div style="font-size:13px; color:var(--text-muted);">Username: ${e.username}</div></div>`;
+    <div id="gameDrawer" class="fixed top-0 right-0 w-[85%] max-w-[360px] h-full bg-gray-50 z-[50] transform translate-x-full transition-transform duration-300 shadow-2xl rounded-l-3xl flex flex-col overflow-hidden sm:absolute">
+        <div class="bg-white px-5 py-4 flex justify-between items-center shadow-sm z-10 border-b border-gray-100">
+            <h2 class="font-bold text-gray-800 text-lg flex items-center">
+                <div class="w-8 h-8 bg-gradient-to-tr from-purple-500 to-blue-500 rounded-lg text-white flex items-center justify-center mr-2 shadow-sm"><i class="fas fa-gamepad text-sm"></i></div>
+                Play Zone
+            </h2>
+            <div class="relative cursor-pointer w-10 h-10 flex items-center justify-center hover:bg-gray-100 rounded-full transition" onclick="openQuickChat()">
+                <i id="bellIcon" class="fas fa-bell text-gray-600 text-xl"></i>
+                <span id="drawerBadge" class="absolute top-1.5 right-1.5 bg-red-500 text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full hidden border-2 border-white shadow-sm">0</span>
+            </div>
+        </div>
+
+        <div class="p-5 flex-1 overflow-y-auto no-scrollbar">
+            <h3 class="text-xs font-bold text-gray-400 mb-4 uppercase tracking-wider">Mini Games</h3>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="bg-white p-4 rounded-2xl flex flex-col items-center justify-center cursor-pointer hover:bg-blue-50 transition shadow-sm border border-gray-100 group" onclick="openGame('tictactoe.html', 'Tic-Tac-Toe (XO)')">
+                    <div class="w-14 h-14 bg-red-50 rounded-full text-red-500 flex items-center justify-center text-3xl mb-3 shadow-sm group-hover:scale-110 transition"><i class="fas fa-times"></i><i class="far fa-circle text-lg ml-1"></i></div>
+                    <span class="text-sm font-bold text-gray-700">Tic-Tac-Toe</span>
+                </div>
+                
+                <div class="bg-white p-4 rounded-2xl flex flex-col items-center justify-center cursor-pointer hover:bg-blue-50 transition shadow-sm border border-gray-100 group" onclick="openGame('snake.html', 'Snake Game')">
+                    <div class="w-14 h-14 bg-green-50 rounded-full text-green-500 flex items-center justify-center text-3xl mb-3 shadow-sm group-hover:scale-110 transition"><i class="fas fa-staff-snake"></i></div>
+                    <span class="text-sm font-bold text-gray-700">Snake</span>
+                </div>
+
+                <div class="bg-white p-4 rounded-2xl flex flex-col items-center justify-center cursor-pointer hover:bg-blue-50 transition shadow-sm border border-gray-100 group" onclick="openGame('2048.html', '2048')">
+                    <div class="w-14 h-14 bg-yellow-50 rounded-full text-yellow-500 flex items-center justify-center text-2xl font-black mb-3 shadow-sm group-hover:scale-110 transition">2048</div>
+                    <span class="text-sm font-bold text-gray-700">2048</span>
+                </div>
+
+                <div class="bg-white p-4 rounded-2xl flex flex-col items-center justify-center cursor-pointer hover:bg-blue-50 transition shadow-sm border border-gray-100 group" onclick="openGame('memory.html', 'Memory Match')">
+                    <div class="w-14 h-14 bg-purple-50 rounded-full text-purple-500 flex items-center justify-center text-2xl mb-3 shadow-sm group-hover:scale-110 transition"><i class="fas fa-brain"></i></div>
+                    <span class="text-sm font-bold text-gray-700">Memory</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="p-4 bg-white border-t border-gray-100">
+            <button onclick="closeGameDrawer()" class="w-full bg-gray-100 text-gray-700 font-bold py-3 rounded-xl hover:bg-gray-200 transition">
+                <i class="fas fa-times mr-2"></i> ปิดเมนู
+            </button>
+        </div>
+    </div>
+
+
+    <div id="quickChatOverlay" class="fixed inset-0 bg-black/60 z-[60] hidden flex items-center justify-center backdrop-blur-md p-4 transition-opacity duration-300" onclick="if(event.target === this) closeQuickChat()">
+        <div class="bg-white w-full max-w-[380px] rounded-3xl overflow-hidden flex flex-col shadow-2xl transform scale-95 transition-transform duration-300" id="quickChatModal" style="height: 65vh; max-height: 600px;">
+            <div class="bg-blue-600 px-4 py-3 text-white flex justify-between items-center shadow-md z-10">
+                <span class="font-bold text-sm flex items-center"><i class="fas fa-bolt text-yellow-300 mr-2 text-lg"></i> แชทด่วน (Quick Reply)</span>
+                <i class="fas fa-times cursor-pointer w-8 h-8 flex items-center justify-center bg-blue-700/50 rounded-full hover:bg-blue-700 transition" onclick="closeQuickChat()"></i>
+            </div>
+            
+            <div id="quickChatBox" class="flex-1 bg-gray-100 p-3 overflow-y-auto no-scrollbar flex flex-col space-y-3"></div>
+            
+            <div class="p-3 bg-white border-t flex gap-2 items-center">
+                <input type="text" id="quickChatInput" class="flex-1 bg-gray-100 rounded-2xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-300 transition" placeholder="ตอบกลับด่วน..." onkeyup="if(event.key==='Enter') handleQuickSend();">
+                <button onclick="handleQuickSend()" class="bg-blue-600 text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-blue-700 shadow-md transform active:scale-90"><i class="fas fa-paper-plane text-sm pl-0.5"></i></button>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="gameModalOverlay" class="fixed inset-0 bg-black/80 z-[70] hidden flex items-center justify-center p-4 sm:p-8 backdrop-blur-sm transition-opacity duration-300" onclick="if(event.target === this) closeGameModal()">
+        <div class="bg-white w-full max-w-full sm:max-w-2xl md:max-w-3xl lg:max-w-4xl rounded-3xl overflow-hidden flex flex-col h-[85vh] sm:h-[80vh] shadow-2xl relative transform scale-95 transition-transform duration-300" id="gameModalBox">
+            <div class="bg-slate-900 px-4 py-3 flex justify-between items-center text-white z-10 shadow-md">
+                <span id="gameModalTitle" class="font-bold text-sm tracking-wide flex items-center"><i class="fas fa-gamepad mr-2 text-blue-400"></i> Play Zone</span>
+                <button onclick="closeGameModal()" class="w-8 h-8 flex items-center justify-center bg-white/10 rounded-full hover:bg-red-500 hover:text-white transition cursor-pointer">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <iframe id="gameFrame" src="" class="w-full flex-1 border-none bg-slate-50"></iframe>
+        </div>
+    </div>
+
+
+    <div id="adminDashboard" class="w-full h-screen max-w-full sm:max-w-3xl md:max-w-4xl lg:max-w-5xl sm:h-[90vh] bg-slate-50 sm:shadow-2xl relative flex flex-col hidden overflow-hidden sm:rounded-3xl border border-gray-200">
+        <div class="bg-slate-900 px-5 py-4 flex items-center justify-between z-20 text-white shadow-md relative overflow-hidden">
+            <div class="absolute right-0 top-0 opacity-10 text-6xl transform translate-x-4 -translate-y-4"><i class="fas fa-shield-alt"></i></div>
+            <div class="flex items-center gap-3 relative z-10">
+                <div class="bg-blue-500/20 p-2 rounded-lg text-blue-400"><i class="fas fa-crown"></i></div>
+                <div>
+                    <h3 class="font-bold text-lg leading-tight tracking-wide">Admin Center</h3>
+                    <p class="text-[11px] text-slate-400">ควบคุมระบบและจัดการผู้ใช้</p>
+                </div>
+            </div>
+            <button onclick="leaveAdmin()" class="text-red-400 hover:text-white hover:bg-red-500/20 p-2 sm:px-4 rounded-lg text-sm font-bold flex items-center transition relative z-10">
+                <i class="fas fa-sign-out-alt sm:mr-2"></i> <span class="hidden sm:inline">ออกจากระบบ</span>
+            </button>
+        </div>
+
+        <div class="flex bg-white shadow-sm z-10 border-b border-gray-200">
+            <div onclick="switchAdminTab('chat')" id="tab-chat" class="admin-tab active flex-1">
+                <i class="fas fa-comment-dots mb-1 block text-lg sm:inline sm:mr-2"></i> <span class="text-xs sm:text-sm">จัดการข้อความ</span>
+            </div>
+            <div onclick="switchAdminTab('settings')" id="tab-settings" class="admin-tab flex-1">
+                <i class="fas fa-broom mb-1 block text-lg sm:inline sm:mr-2"></i> <span class="text-xs sm:text-sm">ล้างข้อมูล</span>
+            </div>
+            <div onclick="switchAdminTab('addAdmin')" id="tab-addAdmin" class="admin-tab flex-1">
+                <i class="fas fa-user-plus mb-1 block text-lg sm:inline sm:mr-2"></i> <span class="text-xs sm:text-sm">เพิ่มแอดมิน</span>
+            </div>
+        </div>
+
+        <div class="flex-1 overflow-y-auto relative bg-slate-50">
+            <div id="content-chat" class="p-4 sm:p-6 space-y-4 pb-20">
+                <div class="flex justify-between items-center bg-blue-50 text-blue-800 px-4 py-3 rounded-xl text-sm border border-blue-100 shadow-sm">
+                    <span class="font-semibold"><i class="fas fa-broadcast-tower mr-2 animate-pulse text-red-500"></i> ข้อความแบบ Real-time</span>
+                    <button onclick="loadAdminMessages(true)" class="bg-white hover:bg-blue-100 text-blue-600 px-4 py-1.5 rounded-lg text-xs font-bold transition shadow-sm border border-blue-200">
+                        <i class="fas fa-sync-alt mr-1"></i> โหลดใหม่
+                    </button>
+                </div>
+                <div id="adminListArea" class="grid grid-cols-1 lg:grid-cols-2 gap-4"></div>
+            </div>
+
+            <div id="content-settings" class="p-6 hidden h-full flex flex-col items-center justify-center">
+                <div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-200 text-center max-w-md w-full">
+                    <div class="w-24 h-24 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6 border-4 border-red-100"><i class="fas fa-trash-alt text-4xl"></i></div>
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2">ล้างประวัติการแชท</h2>
+                    <p class="text-sm text-gray-500 mb-8">ลบข้อความทั้งหมดที่เคยสนทนา (ผู้ใช้ที่โดนแบนจะยังคงโดนแบนอยู่)</p>
+                    <button onclick="adminClearChat()" class="w-full bg-red-500 text-white font-bold py-4 rounded-xl hover:bg-red-600 shadow-lg shadow-red-500/30 transition transform hover:-translate-y-1 text-lg">
+                        <i class="fas fa-exclamation-triangle mr-2"></i> ล้างข้อมูลทั้งหมดเดี๋ยวนี้
+                    </button>
+                </div>
+            </div>
+
+            <div id="content-addAdmin" class="p-6 hidden h-full flex flex-col items-center justify-center">
+                <div class="bg-white p-8 sm:p-10 rounded-3xl shadow-sm border border-gray-200 w-full max-w-md">
+                    <h2 class="text-2xl font-bold text-slate-800 mb-1 border-b border-gray-100 pb-4"><i class="fas fa-user-plus text-blue-500 mr-2"></i> เพิ่มผู้ดูแลระบบ</h2>
+                    <p class="text-sm text-gray-400 mb-6 mt-3">สร้างสิทธิ์เข้าถึงระบบให้ทีมงานของคุณ</p>
+                    <div class="space-y-5">
+                        <div>
+                            <label class="text-sm font-bold text-slate-500 ml-1">ชื่อผู้ใช้งาน (Username)</label>
+                            <input type="text" id="newAdminUser" class="w-full mt-1.5 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5 focus:outline-none focus:border-blue-500 transition text-base" placeholder="เช่น admin_john">
+                        </div>
+                        <div>
+                            <label class="text-sm font-bold text-slate-500 ml-1">รหัสผ่าน (Password)</label>
+                            <input type="password" id="newAdminPass" class="w-full mt-1.5 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5 focus:outline-none focus:border-blue-500 transition text-base" placeholder="ตั้งรหัสผ่านที่คาดเดายาก...">
+                        </div>
+                        <button onclick="adminAddSubAdmin()" class="w-full bg-slate-800 text-white font-bold py-4 rounded-xl hover:bg-slate-900 shadow-md mt-6 transition transform hover:-translate-y-0.5 text-lg">บันทึกข้อมูล</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // **********************************************
+        // เปลี่ยน URL ด้านล่างเป็นของคุณเอง
+        // **********************************************
+        const API_URL = "https://script.google.com/macros/s/AKfycbxfsMXMgEjNwIvjPw141EQR_I3zParldjiSnUHqy1SelZaAVpLlJVDJdAZjBgjUb5iF/exec"; 
+        
+        let pollingInterval = null;
+        let currentUserDisplayName = "";
+        let currentMessages = []; 
+        let isSending = false; 
+
+        let adminPass = "";
+        let adminPollingInterval = null;
+
+        let isDrawerOpen = false;
+        let isQuickChatOpen = false;
+        let lastSeenMsgCount = 0; 
+
+        const customSwal = Swal.mixin({
+            customClass: { popup: 'swal2-popup', confirmButton: 'bg-blue-600 text-white font-bold px-6 py-2.5 rounded-xl hover:bg-blue-700 mx-2 shadow-md transition', cancelButton: 'bg-gray-100 text-gray-600 font-bold px-6 py-2.5 rounded-xl hover:bg-gray-200 mx-2 transition' },
+            buttonsStyling: false, backdrop: `rgba(15, 23, 42, 0.6) backdrop-filter backdrop-blur-sm`
         });
-    }
-</script>
+
+        // ----------------------- 1. ส่วนของ UI และ Navigation -----------------------
+        function toggleLoginMode(mode) {
+            if(mode === 'admin') { document.getElementById('loginScreen').classList.add('hidden'); document.getElementById('adminLoginScreen').classList.remove('hidden'); } 
+            else { document.getElementById('adminLoginScreen').classList.add('hidden'); document.getElementById('loginScreen').classList.remove('hidden'); }
+        }
+
+        function showLoading(show) {
+            if(show) document.getElementById("loadingOverlay").classList.remove("hidden");
+            else document.getElementById("loadingOverlay").classList.add("hidden");
+        }
+
+        function formatTime(isoString) {
+            if(!isoString) return "";
+            const date = new Date(isoString);
+            return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+        }
+
+        // ----------------------- 2. ลิ้นชักเกม & แจ้งเตือน -----------------------
+        function openGameDrawer() {
+            isDrawerOpen = true;
+            lastSeenMsgCount = currentMessages.length; 
+            updateBadge(0); 
+            document.getElementById('gameDrawerOverlay').classList.remove('hidden');
+            document.getElementById('gameDrawer').classList.remove('translate-x-full');
+        }
+
+        function closeGameDrawer() {
+            isDrawerOpen = false;
+            lastSeenMsgCount = currentMessages.length; 
+            updateBadge(0);
+            document.getElementById('gameDrawer').classList.add('translate-x-full');
+            setTimeout(() => { document.getElementById('gameDrawerOverlay').classList.add('hidden'); }, 300);
+            
+            const box = document.getElementById("chatBox");
+            if(box) box.scrollTop = box.scrollHeight;
+        }
+
+        function updateBadge(unreadCount) {
+            const drawerBadge = document.getElementById('drawerBadge');
+            const mainBadge = document.getElementById('mainChatBadge');
+            const bellIcon = document.getElementById('bellIcon');
+
+            if (unreadCount > 0) {
+                if(drawerBadge) { drawerBadge.innerText = unreadCount; drawerBadge.classList.remove('hidden'); }
+                if(mainBadge) { mainBadge.innerText = unreadCount; mainBadge.classList.remove('hidden'); }
+                if(bellIcon) { bellIcon.classList.remove('bell-ring'); void bellIcon.offsetWidth; bellIcon.classList.add('bell-ring'); }
+            } else {
+                if(drawerBadge) drawerBadge.classList.add('hidden');
+                if(mainBadge) mainBadge.classList.add('hidden');
+            }
+        }
+
+        // ----------------------- 3. หน้าต่างเกม (Game Modal iframe) -----------------------
+        function openGame(gameUrl, gameTitle) {
+            document.getElementById('gameModalTitle').innerHTML = `<i class="fas fa-gamepad mr-2 text-blue-400"></i> ${gameTitle}`;
+            document.getElementById('gameFrame').src = gameUrl; 
+            
+            document.getElementById('gameModalOverlay').classList.remove('hidden');
+            setTimeout(() => document.getElementById('gameModalBox').classList.remove('scale-95'), 10);
+        }
+
+        function closeGameModal() {
+            document.getElementById('gameModalBox').classList.add('scale-95');
+            setTimeout(() => {
+                document.getElementById('gameModalOverlay').classList.add('hidden');
+                document.getElementById('gameFrame').src = ""; // ล้างหน้าจอ
+            }, 300);
+        }
+
+        // ----------------------- 4. แชทด่วน (Quick Chat) -----------------------
+        function openQuickChat() {
+            isQuickChatOpen = true;
+            lastSeenMsgCount = currentMessages.length; 
+            updateBadge(0);
+            document.getElementById('quickChatOverlay').classList.remove('hidden');
+            document.getElementById('quickChatModal').classList.remove('scale-95');
+            document.getElementById('quickChatModal').classList.add('scale-100');
+            renderQuickChat(currentMessages); 
+            setTimeout(() => document.getElementById('quickChatInput').focus(), 300);
+        }
+
+        function closeQuickChat() {
+            isQuickChatOpen = false;
+            document.getElementById('quickChatModal').classList.remove('scale-100');
+            document.getElementById('quickChatModal').classList.add('scale-95');
+            setTimeout(() => { document.getElementById('quickChatOverlay').classList.add('hidden'); }, 200);
+        }
+
+        function handleQuickSend() {
+            const inputEl = document.getElementById("quickChatInput");
+            const text = inputEl.value.trim();
+            if (text === "") return;
+            inputEl.value = ""; 
+            lastSeenMsgCount++; 
+            executeSend(text);
+        }
+
+        function renderQuickChat(messages) {
+            const box = document.getElementById("quickChatBox");
+            if(!box) return;
+            let html = "";
+            const myId = getUserId();
+            const recentMessages = messages.slice(-20); 
+
+            recentMessages.forEach(msg => {
+                const isMe = msg.userId === myId;
+                const isDeleted = msg.status === "deleted";
+                const content = isDeleted ? `<span class="italic text-gray-400">ถูกลบ</span>` : (msg.text.startsWith("[IMAGE]") ? "ส่งรูปภาพ 📷" : msg.text);
+
+                if (isMe) {
+                    html += `<div class="flex justify-end mb-2"><div class="bg-green-100 text-gray-800 px-3 py-1.5 rounded-xl rounded-br-sm text-[13px] shadow-sm max-w-[85%] break-words">${content}</div></div>`;
+                } else {
+                    html += `<div class="flex items-start gap-1.5 mb-2">
+                        <div class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-[10px] font-bold mt-0.5">${(msg.name||'A').charAt(0).toUpperCase()}</div>
+                        <div class="bg-white text-gray-800 px-3 py-1.5 rounded-xl rounded-tl-sm text-[13px] shadow-sm max-w-[80%] border border-gray-100 break-words"><span class="text-[9px] text-gray-400 block mb-0.5">${msg.name}</span>${content}</div>
+                    </div>`;
+                }
+            });
+            box.innerHTML = html;
+            setTimeout(() => box.scrollTop = box.scrollHeight, 50);
+        }
+
+        // ----------------------- 5. ส่วนของผู้ใช้ทั่วไป (User Chat) -----------------------
+        function getUserId() {
+            let userId = localStorage.getItem("chat_user_id");
+            if (!userId) { userId = "USER_" + Math.random().toString(36).substr(2, 9); localStorage.setItem("chat_user_id", userId); }
+            return userId;
+        }
+
+        function enterChat() {
+            const nameInput = document.getElementById("displayName").value.trim();
+            if (!nameInput) return customSwal.fire({ icon: 'warning', title: 'แจ้งเตือน', text: 'กรุณาตั้งชื่อเล่นก่อนเข้าห้องแชทครับ' });
+            
+            currentUserDisplayName = nameInput;
+            document.getElementById("loginScreen").classList.add("hidden");
+            document.getElementById("chatScreen").classList.remove("hidden");
+            
+            loadMessages(true);
+            if(pollingInterval) clearInterval(pollingInterval);
+            pollingInterval = setInterval(() => loadMessages(false), 3000);
+        }
+
+        function leaveChat() {
+            clearInterval(pollingInterval);
+            document.getElementById("chatScreen").classList.add("hidden");
+            document.getElementById("loginScreen").classList.remove("hidden");
+        }
+
+        function handleSendText() {
+            const inputEl = document.getElementById("chatInput");
+            const text = inputEl.value.trim();
+            if (text === "") return;
+            inputEl.value = ""; 
+            if(isDrawerOpen && !isQuickChatOpen) lastSeenMsgCount++;
+            executeSend(text);
+        }
+
+        function handleImageSelection(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            event.target.value = ""; 
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement("canvas");
+                    let width = img.width, height = img.height;
+                    const MAX = 400; 
+                    if (width > MAX) { height = Math.round((height * MAX) / width); width = MAX; }
+                    canvas.width = width; canvas.height = height;
+                    const ctx = canvas.getContext("2d");
+                    ctx.drawImage(img, 0, 0, width, height);
+                    if(isDrawerOpen && !isQuickChatOpen) lastSeenMsgCount++;
+                    executeSend("[IMAGE]" + canvas.toDataURL("image/jpeg", 0.6));
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function executeSend(payloadText) {
+            const userId = getUserId();
+            const tempMsgId = "temp_" + Date.now();
+            const tempMessage = { msgId: tempMsgId, timestamp: new Date().toISOString(), userId: userId, name: currentUserDisplayName, text: payloadText, status: "active", isTemp: true };
+
+            currentMessages.push(tempMessage);
+            renderChatBox(currentMessages);
+            if(isQuickChatOpen) renderQuickChat(currentMessages); 
+
+            isSending = true;
+
+            fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "send", userId: userId, name: currentUserDisplayName, text: payloadText }) })
+            .then(res => res.json())
+            .then(data => {
+                isSending = false; 
+                if (!data.success) { customSwal.fire('ส่งไม่ได้', data.message, 'error'); currentMessages = currentMessages.filter(m => m.msgId !== tempMsgId); renderChatBox(currentMessages); } 
+                else loadMessages(false);
+            }).catch(err => {
+                isSending = false;
+                currentMessages = currentMessages.filter(m => m.msgId !== tempMsgId);
+                renderChatBox(currentMessages);
+                customSwal.fire('ข้อผิดพลาด', 'กรุณาตรวจสอบอินเทอร์เน็ต', 'error');
+            });
+        }
+
+        function loadMessages(isInitialLoad) {
+            if(isSending && !isInitialLoad) return; 
+            if(isInitialLoad && !adminPass) showLoading(true);
+
+            fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "get" }) })
+            .then(res => res.json())
+            .then(data => {
+                if(isInitialLoad && !adminPass) showLoading(false);
+                if (data.success && !isSending) { 
+                    currentMessages = data.messages; 
+                    renderChatBox(currentMessages); 
+
+                    // จัดการการแจ้งเตือน
+                    if (isDrawerOpen) {
+                        if (isQuickChatOpen) {
+                            lastSeenMsgCount = currentMessages.length;
+                            renderQuickChat(currentMessages);
+                        } else {
+                            let unread = currentMessages.length - lastSeenMsgCount;
+                            if (unread > 0) updateBadge(unread);
+                        }
+                    } else {
+                        lastSeenMsgCount = currentMessages.length;
+                    }
+                }
+            }).catch(err => { if(isInitialLoad && !adminPass) showLoading(false); });
+        }
+
+        function renderChatBox(messages) {
+            const chatBox = document.getElementById("chatBox");
+            if(!chatBox) return;
+            const isScrolledToBottom = chatBox.scrollHeight - chatBox.clientHeight <= chatBox.scrollTop + 50;
+            
+            let html = `<div class="text-center my-6"><span class="bg-gray-800/30 text-white text-[10px] px-4 py-1.5 rounded-full font-medium shadow-sm"><i class="fas fa-lock mr-1"></i> การสนทนานี้ถูกเข้ารหัส</span></div>`;
+            const myId = getUserId();
+
+            messages.forEach(msg => {
+                const isMe = msg.userId === myId;
+                const isDeleted = msg.status === "deleted";
+                const firstLetter = (msg.name || "A").charAt(0).toUpperCase();
+                const timeStr = formatTime(msg.timestamp);
+                const opacityClass = msg.isTemp ? "opacity-70" : "opacity-100";
+
+                let contentHTML = isDeleted ? `<p class="text-sm italic text-slate-500">🚫 ข้อความถูกลบแล้ว</p>` 
+                    : msg.text.startsWith("[IMAGE]") ? `<img src="${msg.text.replace("[IMAGE]", "")}" class="w-48 sm:w-64 rounded-lg cursor-pointer border border-black/10" onclick="window.open(this.src)">` 
+                    : `<p class="text-sm sm:text-base break-words">${msg.text}</p>`;
+
+                if (isMe) {
+                    html += `<div class="flex flex-col items-end w-full mb-3 ${opacityClass}"><div class="flex items-end gap-1.5 max-w-[85%] sm:max-w-[75%] md:max-w-[60%] lg:max-w-[50%]"><span class="text-[9px] text-gray-400 mb-1 shrink-0">${timeStr}</span><div class="bg-[#e4f6cb] text-slate-800 p-2.5 sm:p-3 rounded-2xl rounded-br-sm shadow-sm border border-[#d2eba8]">${contentHTML}</div></div></div>`;
+                } else {
+                    html += `<div class="flex items-start gap-2.5 w-full mb-3"><div class="w-9 h-9 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold text-sm shrink-0 shadow-sm border border-indigo-200 mt-1">${firstLetter}</div><div class="flex flex-col items-start max-w-[85%] sm:max-w-[75%] md:max-w-[60%] lg:max-w-[50%]"><span class="text-[11px] text-gray-500 font-medium ml-1 mb-0.5">${msg.name}</span><div class="flex items-end gap-1.5"><div class="bg-white text-slate-800 p-2.5 sm:p-3 rounded-2xl rounded-tl-sm shadow-sm border border-slate-100">${contentHTML}</div><span class="text-[9px] text-gray-400 mb-1 shrink-0">${timeStr}</span></div></div></div>`;
+                }
+            });
+            chatBox.innerHTML = html;
+            if(isScrolledToBottom || messages[messages.length - 1]?.isTemp) setTimeout(() => chatBox.scrollTop = chatBox.scrollHeight, 50);
+        }
+
+        // ----------------------- 6. ส่วนของ Admin Dashboard -----------------------
+        function switchAdminTab(tabName) {
+            document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById('tab-' + tabName).classList.add('active');
+            document.getElementById('content-chat').classList.add('hidden');
+            document.getElementById('content-settings').classList.add('hidden');
+            document.getElementById('content-addAdmin').classList.add('hidden');
+            document.getElementById('content-' + tabName).classList.remove('hidden');
+
+            if(tabName === 'chat') { loadAdminMessages(true); adminPollingInterval = setInterval(() => loadAdminMessages(false), 4000); } 
+            else { clearInterval(adminPollingInterval); }
+        }
+
+        function enterAdmin() {
+            const passInput = document.getElementById("adminPassword").value.trim();
+            if (!passInput) return customSwal.fire({icon: 'warning', title: 'แจ้งเตือน', text: 'กรุณากรอกรหัสผ่าน'});
+            adminPass = passInput; 
+            document.getElementById("adminLoginScreen").classList.add("hidden");
+            document.getElementById("adminDashboard").classList.remove("hidden");
+            switchAdminTab('chat');
+        }
+
+        function leaveAdmin() {
+            adminPass = ""; document.getElementById("adminPassword").value = ""; clearInterval(adminPollingInterval);
+            document.getElementById("adminDashboard").classList.add("hidden"); document.getElementById("adminLoginScreen").classList.remove("hidden");
+        }
+
+        function loadAdminMessages(showLoad) {
+            if(showLoad) showLoading(true);
+            fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "get" }) })
+            .then(res => res.json())
+            .then(data => {
+                if(showLoad) showLoading(false);
+                if (data.success) renderAdminList(data.messages);
+            }).catch(err => { if(showLoad) showLoading(false); });
+        }
+
+        function renderAdminList(messages) {
+            const listArea = document.getElementById("adminListArea");
+            let html = "";
+            if(messages.length === 0) { listArea.innerHTML = '<div class="col-span-full text-center text-slate-400 mt-20 flex flex-col items-center"><i class="fas fa-box-open text-4xl mb-3 opacity-50"></i><p>ยังไม่มีข้อความเข้าสู่ระบบ</p></div>'; return; }
+            const reversedMessages = [...messages].reverse();
+
+            reversedMessages.forEach(msg => {
+                const isDeleted = msg.status === "deleted";
+                const timeStr = formatTime(msg.timestamp);
+                let contentHTML = msg.text.startsWith("[IMAGE]") ? `<img src="${msg.text.replace("[IMAGE]", "")}" class="w-full sm:w-48 rounded-lg border border-slate-200 mt-3 shadow-sm">` : `<p class="text-sm mt-2 text-slate-700 break-words font-medium">${msg.text}</p>`;
+
+                html += `
+                <div class="msg-card bg-white p-4 rounded-2xl shadow-sm border ${isDeleted ? 'border-red-200 bg-red-50/30' : 'border-slate-100'}">
+                    <div class="flex justify-between items-start">
+                        <div class="flex-1 pr-2 sm:pr-4">
+                            <div class="flex items-center gap-2"><span class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-xs border border-indigo-200">${msg.name.charAt(0).toUpperCase() || '?'}</span>
+                            <div><span class="font-bold text-slate-800 text-sm block leading-tight">${msg.name}</span><span class="text-[10px] text-slate-400 font-mono tracking-tighter hidden sm:block">ID: ${msg.userId}</span></div></div>
+                            ${isDeleted ? `<div class="mt-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-red-100 text-red-600 text-xs font-bold"><i class="fas fa-trash-alt"></i> ถูกลบโดยผู้ดูแล</div>` : contentHTML}
+                            <div class="text-[10px] text-slate-400 mt-3"><i class="far fa-clock mr-1"></i>${timeStr}</div>
+                        </div>
+                        ${!isDeleted ? `<div class="flex flex-col gap-2 shrink-0">
+                            <button onclick="adminDelete('${msg.msgId}')" class="bg-red-50 text-red-500 hover:bg-red-500 hover:text-white px-3 sm:px-4 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 border border-red-100 hover:border-red-500"><i class="fas fa-trash-alt"></i><span class="hidden sm:inline">ลบ</span></button>
+                            <button onclick="adminBan('${msg.userId}', '${msg.name}')" class="bg-slate-100 text-slate-600 hover:bg-slate-800 hover:text-white px-3 sm:px-4 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 border border-slate-200"><i class="fas fa-ban"></i><span class="hidden sm:inline">แบน</span></button>
+                        </div>` : ''}
+                    </div>
+                </div>`;
+            });
+            listArea.innerHTML = html;
+        }
+
+        function adminDelete(msgId) {
+            customSwal.fire({ title: 'ยืนยันลบข้อความ?', html: '<span class="text-sm text-gray-500">ข้อความนี้จะแสดงว่า "ถูกลบแล้ว" และไม่สามารถกู้คืนได้</span>', icon: 'warning', iconColor: '#ef4444', showCancelButton: true, confirmButtonColor: '#ef4444', confirmButtonText: 'ลบข้อมูล', cancelButtonText: 'ยกเลิก', reverseButtons: true })
+            .then((result) => {
+                if (result.isConfirmed) {
+                    showLoading(true);
+                    fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "delete", msgId: msgId, adminPass: adminPass }) })
+                    .then(r => r.json()).then(data => {
+                        showLoading(false);
+                        if(data.success) { customSwal.fire({icon: 'success', title: 'ลบสำเร็จ', showConfirmButton: false, timer: 1500}); loadAdminMessages(false); }
+                        else customSwal.fire('ผิดพลาด', data.message, 'error');
+                    });
+                }
+            })
+        }
+
+        function adminBan(userId, userName) {
+            customSwal.fire({ title: `<span class="text-2xl font-bold">ระงับบัญชี <span class="text-red-500">${userName}</span> ?</span>`, html: `<div class="bg-red-50 p-3 rounded-lg border border-red-100 mt-2 text-sm text-red-600 text-left"><i class="fas fa-info-circle mr-1"></i> ผู้ใช้นี้จะถูกบล็อก IP และไม่สามารถส่งข้อความใดๆ ลงในระบบได้อีก</div>`, icon: 'error', showCancelButton: true, confirmButtonColor: '#1f2937', confirmButtonText: 'ยืนยันแบน', cancelButtonText: 'ยกเลิก', reverseButtons: true })
+            .then((result) => {
+                if (result.isConfirmed) {
+                    showLoading(true);
+                    fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "ban", targetUserId: userId, adminPass: adminPass }) })
+                    .then(r => r.json()).then(data => {
+                        showLoading(false);
+                        if(data.success) customSwal.fire({icon: 'success', title: 'แบนผู้ใช้สำเร็จ!', showConfirmButton: false, timer: 1500});
+                        else customSwal.fire('ผิดพลาด', data.message, 'error');
+                    });
+                }
+            })
+        }
+
+        function adminClearChat() {
+            customSwal.fire({ title: 'ล้างข้อมูลแชททั้งหมด?', text: "ประวัติการคุยทั้งหมดจะหายไป (ลบออกจากฐานข้อมูลด้วย)", icon: 'warning', iconColor: '#ef4444', showCancelButton: true, confirmButtonColor: '#ef4444', confirmButtonText: 'ล้างข้อมูลเลย', cancelButtonText: 'ยกเลิก' })
+            .then((result) => {
+                if (result.isConfirmed) {
+                    showLoading(true);
+                    fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "clear_chat", adminPass: adminPass }) })
+                    .then(r => r.json()).then(data => {
+                        showLoading(false);
+                        if(data.success) { customSwal.fire({icon: 'success', title: 'ล้างห้องแชทแล้ว!', showConfirmButton: false, timer: 1500}); switchAdminTab('chat'); }
+                        else customSwal.fire('ผิดพลาด', data.message, 'error');
+                    });
+                }
+            })
+        }
+
+        function adminAddSubAdmin() {
+            const user = document.getElementById("newAdminUser").value.trim();
+            const pass = document.getElementById("newAdminPass").value.trim();
+            if(!user || !pass) return customSwal.fire({icon: 'warning', title: 'เตือน', text: 'กรุณากรอกข้อมูลให้ครบ'});
+
+            showLoading(true);
+            fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "add_admin", adminPass: adminPass, newUser: user, newPass: pass }) })
+            .then(r => r.json()).then(data => {
+                showLoading(false);
+                if(data.success) {
+                    customSwal.fire({icon: 'success', title: 'บันทึกสำเร็จ', text: data.message, showConfirmButton: false, timer: 2000});
+                    document.getElementById("newAdminUser").value = ""; document.getElementById("newAdminPass").value = "";
+                } else customSwal.fire('ผิดพลาด', data.message, 'error');
+            });
+        }
+    </script>
 </body>
 </html>

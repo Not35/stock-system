@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tic-Tac-Toe</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { font-family: 'Prompt', sans-serif; background-color: #f8fafc; margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
+        .cell { font-family: 'Arial', sans-serif; transition: all 0.2s ease-in-out; }
+        .cell:active { transform: scale(0.95); }
+        .win-pulse { animation: pulse 1s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); background-color: #dcfce7; } 100% { transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="text-center mb-6 w-full px-4">
+        <h2 class="text-2xl font-bold text-slate-800 mb-2">Tic-Tac-Toe</h2>
+        <div id="statusText" class="bg-white py-2 px-4 rounded-xl shadow-sm border border-slate-200 inline-block font-bold text-slate-600">
+            ถึงตาของผู้เล่น: <span id="currentPlayerDisplay" class="text-blue-500 text-xl">X</span>
+        </div>
+    </div>
+    <div class="bg-white p-4 rounded-3xl shadow-lg border border-slate-100">
+        <div class="grid grid-cols-3 gap-3" id="board"></div>
+    </div>
+    <button onclick="resetGame()" class="mt-8 bg-slate-800 text-white font-bold py-3 px-8 rounded-full shadow-md hover:bg-slate-900 transition flex items-center gap-2 transform active:scale-95">
+        <i class="fas fa-redo-alt"></i> เริ่มเกมใหม่
+    </button>
+
+    <script>
+        const boardEl = document.getElementById('board');
+        const statusText = document.getElementById('statusText');
+        const currentPlayerDisplay = document.getElementById('currentPlayerDisplay');
+        let board = ["", "", "", "", "", "", "", "", ""];
+        let currentPlayer = "X";
+        let gameActive = true;
+        const winConditions = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+
+        function createBoard() {
+            boardEl.innerHTML = "";
+            for (let i = 0; i < 9; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'cell w-20 h-20 sm:w-24 sm:h-24 bg-slate-50 rounded-2xl flex items-center justify-center text-5xl font-black cursor-pointer shadow-inner border-2 border-slate-100';
+                cell.onclick = () => handleCellClick(cell, i);
+                boardEl.appendChild(cell);
+            }
+        }
+
+        function handleCellClick(cell, index) {
+            if (board[index] !== "" || !gameActive) return;
+            board[index] = currentPlayer;
+            cell.innerText = currentPlayer;
+            cell.classList.add(currentPlayer === "X" ? 'text-blue-500' : 'text-red-500');
+            checkWinner();
+        }
+
+        function checkWinner() {
+            let roundWon = false;
+            let winningCells = [];
+            for (let i = 0; i < winConditions.length; i++) {
+                const [a, b, c] = winConditions[i];
+                if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+                    roundWon = true; winningCells = [a, b, c]; break;
+                }
+            }
+            if (roundWon) {
+                statusText.innerHTML = `🎉 ผู้ชนะคือ: <span class="${currentPlayer === 'X' ? 'text-blue-500' : 'text-red-500'} text-xl">${currentPlayer}</span>`;
+                gameActive = false;
+                const cells = document.querySelectorAll('.cell');
+                winningCells.forEach(i => cells[i].classList.add('win-pulse', 'border-green-400'));
+                return;
+            }
+            if (!board.includes("")) {
+                statusText.innerHTML = `<span class="text-slate-500">🤝 เสมอกัน!</span>`;
+                gameActive = false; return;
+            }
+            currentPlayer = currentPlayer === "X" ? "O" : "X";
+            currentPlayerDisplay.innerText = currentPlayer;
+            currentPlayerDisplay.className = currentPlayer === "X" ? "text-blue-500 text-xl" : "text-red-500 text-xl";
+        }
+        function resetGame() { board = ["", "", "", "", "", "", "", "", ""]; currentPlayer = "X"; gameActive = true; statusText.innerHTML = `ถึงตาของผู้เล่น: <span id="currentPlayerDisplay" class="text-blue-500 text-xl">X</span>`; createBoard(); }
+        createBoard();
+    </script>
+</body>
+</html>

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Snake Game</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { font-family: 'Prompt', sans-serif; background-color: #f8fafc; margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; overflow: hidden; touch-action: none;}
+        canvas { background-color: #1e293b; border-radius: 12px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.2); }
+        .btn-dir { background-color: #cbd5e1; width: 60px; height: 60px; border-radius: 50%; font-size: 24px; color: #334155; display: flex; align-items: center; justify-content: center; user-select: none; }
+        .btn-dir:active { background-color: #94a3b8; transform: scale(0.95); }
+    </style>
+</head>
+<body>
+    <div class="mb-4 text-center">
+        <h2 class="text-2xl font-bold text-slate-800">Snake Game</h2>
+        <div class="text-slate-500 font-bold bg-white px-4 py-1 rounded-full shadow-sm mt-1 border">Score: <span id="score" class="text-blue-600 text-lg">0</span></div>
+    </div>
+    
+    <canvas id="gameCanvas" width="300" height="300"></canvas>
+
+    <!-- ปุ่มควบคุมสำหรับมือถือ -->
+    <div class="mt-6 grid grid-cols-3 gap-2">
+        <div></div>
+        <div class="btn-dir" onclick="changeDirection('UP')"><i class="fas fa-chevron-up"></i></div>
+        <div></div>
+        <div class="btn-dir" onclick="changeDirection('LEFT')"><i class="fas fa-chevron-left"></i></div>
+        <div class="btn-dir" onclick="changeDirection('DOWN')"><i class="fas fa-chevron-down"></i></div>
+        <div class="btn-dir" onclick="changeDirection('RIGHT')"><i class="fas fa-chevron-right"></i></div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+        const box = 15; // ขนาดงู
+        let snake = [];
+        snake[0] = { x: 9 * box, y: 10 * box };
+        let food = { x: Math.floor(Math.random() * 19 + 1) * box, y: Math.floor(Math.random() * 19 + 1) * box };
+        let score = 0;
+        let d;
+        let game;
+
+        document.addEventListener("keydown", direction);
+
+        function direction(event) {
+            if (event.keyCode == 37 && d != "RIGHT") d = "LEFT";
+            else if (event.keyCode == 38 && d != "DOWN") d = "UP";
+            else if (event.keyCode == 39 && d != "LEFT") d = "RIGHT";
+            else if (event.keyCode == 40 && d != "UP") d = "DOWN";
+        }
+
+        function changeDirection(newDir) {
+            if (newDir == "LEFT" && d != "RIGHT") d = "LEFT";
+            else if (newDir == "UP" && d != "DOWN") d = "UP";
+            else if (newDir == "RIGHT" && d != "LEFT") d = "RIGHT";
+            else if (newDir == "DOWN" && d != "UP") d = "DOWN";
+        }
+
+        function collision(head, array) {
+            for (let i = 0; i < array.length; i++) {
+                if (head.x == array[i].x && head.y == array[i].y) return true;
+            }
+            return false;
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // วาดงู
+            for (let i = 0; i < snake.length; i++) {
+                ctx.fillStyle = (i == 0) ? "#4ade80" : "#22c55e"; // หัวสีอ่อน ตัวสีเข้ม
+                ctx.fillRect(snake[i].x, snake[i].y, box, box);
+                ctx.strokeStyle = "#1e293b";
+                ctx.strokeRect(snake[i].x, snake[i].y, box, box);
+            }
+
+            // วาดอาหาร
+            ctx.fillStyle = "#ef4444";
+            ctx.beginPath();
+            ctx.arc(food.x + box/2, food.y + box/2, box/2, 0, Math.PI*2);
+            ctx.fill();
+
+            // ตำแหน่งหัวปัจจุบัน
+            let snakeX = snake[0].x;
+            let snakeY = snake[0].y;
+
+            if (d == "LEFT") snakeX -= box;
+            if (d == "UP") snakeY -= box;
+            if (d == "RIGHT") snakeX += box;
+            if (d == "DOWN") snakeY += box;
+
+            // กินอาหาร
+            if (snakeX == food.x && snakeY == food.y) {
+                score++;
+                document.getElementById("score").innerText = score;
+                food = { x: Math.floor(Math.random() * 19 + 1) * box, y: Math.floor(Math.random() * 19 + 1) * box };
+            } else {
+                snake.pop(); // ตัดหาง
+            }
+
+            let newHead = { x: snakeX, y: snakeY };
+
+            // ชนกำแพง หรือชนตัวเอง
+            if (snakeX < 0 || snakeX >= canvas.width || snakeY < 0 || snakeY >= canvas.height || collision(newHead, snake)) {
+                clearInterval(game);
+                ctx.fillStyle = "rgba(0,0,0,0.5)";
+                ctx.fillRect(0,0,canvas.width,canvas.height);
+                ctx.fillStyle = "white";
+                ctx.font = "24px Prompt";
+                ctx.textAlign = "center";
+                ctx.fillText("Game Over!", canvas.width/2, canvas.height/2);
+                ctx.font = "16px Prompt";
+                ctx.fillText("กดปุ่มทิศทางเพื่อเริ่มใหม่", canvas.width/2, canvas.height/2 + 30);
+                
+                // รีเซ็ตเพื่อเริ่มใหม่ถ้ากดอีกครั้ง
+                setTimeout(() => {
+                    document.addEventListener('keydown', restartGame, {once:true});
+                    document.querySelector('.grid').addEventListener('click', restartGame, {once:true});
+                }, 1000);
+                return;
+            }
+
+            snake.unshift(newHead);
+        }
+
+        function restartGame() {
+            snake = [];
+            snake[0] = { x: 9 * box, y: 10 * box };
+            score = 0;
+            d = null;
+            document.getElementById("score").innerText = score;
+            game = setInterval(draw, 120);
+        }
+
+        game = setInterval(draw, 120);
+    </script>
+</body>
+</html>

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Memory Match</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Prompt', sans-serif; background-color: #f1f5f9; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0;}
+        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; perspective: 1000px; }
+        .card { width: 65px; height: 65px; background-color: #cbd5e1; border-radius: 10px; cursor: pointer; display: flex; justify-content: center; align-items: center; font-size: 30px; transform-style: preserve-3d; transition: transform 0.4s; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        .card.flipped { transform: rotateY(180deg); background-color: white; border: 2px solid #3b82f6;}
+        .card.matched { background-color: #dcfce7; border-color: #22c55e; transform: rotateY(180deg) scale(0.95); opacity: 0.8;}
+        .content { transform: rotateY(180deg); display: none; }
+        .card.flipped .content, .card.matched .content { display: block; }
+    </style>
+</head>
+<body>
+
+    <div class="mb-6 text-center">
+        <h2 class="text-2xl font-bold text-slate-800">Memory Match</h2>
+        <p class="text-sm text-slate-500 mt-1">จำนวนครั้งที่เปิด: <span id="moves" class="font-bold text-blue-600">0</span></p>
+    </div>
+
+    <div class="bg-white p-4 rounded-3xl shadow-sm border border-slate-100">
+        <div class="grid" id="gameGrid"></div>
+    </div>
+
+    <button onclick="startGame()" class="mt-8 bg-blue-600 text-white font-bold py-2.5 px-6 rounded-full hover:bg-blue-700 shadow-md">เริ่มใหม่</button>
+
+    <script>
+        const EMOJIS = ['🐶', '🐱', '🐭', '🐰', '🦊', '🐻', '🐼', '🐨'];
+        let cards = [];
+        let flippedCards = [];
+        let matchedPairs = 0;
+        let moves = 0;
+
+        function startGame() {
+            const grid = document.getElementById('gameGrid');
+            grid.innerHTML = '';
+            matchedPairs = 0;
+            moves = 0;
+            document.getElementById('moves').innerText = moves;
+            flippedCards = [];
+
+            // สร้างคู่การ์ด
+            cards = [...EMOJIS, ...EMOJIS];
+            // สับไพ่
+            cards.sort(() => Math.random() - 0.5);
+
+            cards.forEach((emoji, index) => {
+                const card = document.createElement('div');
+                card.classList.add('card');
+                card.dataset.value = emoji;
+                card.dataset.index = index;
+                
+                const content = document.createElement('span');
+                content.classList.add('content');
+                content.innerText = emoji;
+                
+                card.appendChild(content);
+                card.addEventListener('click', flipCard);
+                grid.appendChild(card);
+            });
+        }
+
+        function flipCard() {
+            if (flippedCards.length >= 2) return;
+            if (this.classList.contains('flipped') || this.classList.contains('matched')) return;
+
+            this.classList.add('flipped');
+            flippedCards.push(this);
+
+            if (flippedCards.length === 2) {
+                moves++;
+                document.getElementById('moves').innerText = moves;
+                setTimeout(checkMatch, 600);
+            }
+        }
+
+        function checkMatch() {
+            const [card1, card2] = flippedCards;
+
+            if (card1.dataset.value === card2.dataset.value) {
+                card1.classList.replace('flipped', 'matched');
+                card2.classList.replace('flipped', 'matched');
+                matchedPairs++;
+
+                if (matchedPairs === EMOJIS.length) {
+                    setTimeout(() => alert(`ยินดีด้วย! คุณชนะแล้ว ใช้การเปิดไปทั้งหมด ${moves} ครั้ง 🎉`), 300);
+                }
+            } else {
+                card1.classList.remove('flipped');
+                card2.classList.remove('flipped');
+            }
+            flippedCards = [];
+        }
+
+        startGame();
+    </script>
+</body>
+</html>
